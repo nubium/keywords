@@ -18,6 +18,12 @@ jobs:
 
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress --no-suggest
+      
+    - name: Add sentence-scoring github repository
+      run: composer config repositories.sentence-scoring github https://github.com/nubium/sentence-scoring
+      
+    - name: Install optional sentence-scoring for purposes of phpstan
+      run: composer require "nubium/sentence-scoring"
 
     - name: Run phpstan
       run: vendor/bin/phpstan analyse -c phpstan.neon
