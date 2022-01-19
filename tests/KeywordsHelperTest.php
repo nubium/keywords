@@ -20,7 +20,7 @@ class KeywordsHelperTest extends TestCase
 	}
 
 	/**
-	 * @return array<array>
+	 * @return array<array<mixed>>
 	 */
 	public function dpTestCreateKeywords(): array
 	{
