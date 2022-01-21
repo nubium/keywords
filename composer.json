@@ -11,13 +11,14 @@
 		}
 	},
 	"require": {
-		"ext-intl": "*"
+		"ext-intl": "*",
+		"php": ">=7.4"
 	},
 	"require-dev": {
-		"phpstan/phpstan": "^0.12.81",
-		"phpstan/phpstan-phpunit": "^0.12.18",
-		"phpstan/extension-installer": "^1.1",
-		"phpunit/phpunit": "^9"
+		"phpstan/phpstan": "^1.4.2",
+		"phpstan/phpstan-phpunit": "^1.0.0",
+		"phpstan/extension-installer": "^1.1.0",
+		"phpunit/phpunit": "^9.5"
 	},
 	"autoload-dev": {
 		"psr-4": {
@@ -27,11 +28,5 @@
 	"suggest": {
 		"nubium/sentence-scoring": "Allows you to use ScoringKeywordsService."
 
-	},
-	"repositories": [
-		{
-			"url": "https://github.com/nubium/sentence-scoring",
-			"type": "github"
-		}
-	]
+	}
 }

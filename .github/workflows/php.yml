@@ -7,33 +7,81 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+
+  validate-composer:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: [7.4, 8.1]
 
     steps:
     - uses: actions/checkout@v2
 
-    - name: Validate composer.json and composer.lock
-      run: composer validate
-
     - name: Install dependencies
-      run: composer install --prefer-dist --no-progress --no-suggest
-      
-    - name: Add sentence-scoring github repository
-      run: composer config repositories.sentence-scoring github https://github.com/nubium/sentence-scoring
-      
-    - name: Install optional sentence-scoring for purposes of phpstan
-      run: composer require "nubium/sentence-scoring"
-
-    - name: Run phpstan
-      run: vendor/bin/phpstan analyse -c phpstan.neon
-
-    - name: Run phpunit
-      run: vendor/bin/phpunit -c phpunit.xml
-
-    - name: Publish Unit Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v1
-      if: always()
+      uses: php-actions/composer@v6
       with:
-        files: tests/results/**/*.xml
-        report_individual_runs: "true"
+        php_version: ${{ matrix.php-version }}
+        php_extensions: intl
+
+    - name: Validate composer.json and composer.lock
+      uses: php-actions/composer@master
+      with:
+        php_version: ${{ matrix.php-version }}
+        php_extensions: intl
+        command: validate
+
+  phpstan:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: [7.4, 8.1]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        uses: php-actions/composer@master
+        with:
+          php_version: ${{ matrix.php-version }}
+          php_extensions: intl
+
+      - name: Add sentence-scoring github repository
+        uses: php-actions/composer@v6
+        with:
+          php_version: ${{ matrix.php-version }}
+          php_extensions: intl
+          command: config repositories.sentence-scoring github https://github.com/nubium/sentence-scoring
+
+      - name: Install optional sentence-scoring for purposes of phpstan
+        uses: php-actions/composer@v6
+        with:
+          php_version: ${{ matrix.php-version }}
+          php_extensions: intl
+          ssh_key: ${{ secrets.SSH_KEY }}
+          ssh_key_pub: ${{ secrets.SSH_KEY_PUB }}
+          command: require nubium/sentence-scoring
+
+      - name: Run phpstan
+        run: vendor/bin/phpstan analyse -c phpstan.neon
+
+  phpunit:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: [ 7.4, 8.1 ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        uses: php-actions/composer@master
+        with:
+          php_version: ${{ matrix.php-version }}
+          php_extensions: intl
+
+      - name: Run unit tests
+        run: php -v && vendor/bin/phpunit -c phpunit.xml
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          files: tests/results/**/*.xml
+          report_individual_runs: "true"
